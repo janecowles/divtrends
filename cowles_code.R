@@ -41,19 +41,19 @@ e1_yrmax <- e1[e1$ExpYear==max(e1$ExpYear),]
 
 e1_yr1MOD <- lm(Sr~NAdd+Field,e1_yr1)
 summary(e1_yr1MOD)
-ggplot(e1_yr1,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()
+ggplot(e1_yr1,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()+labs(title="e1 yr 1")
 
 e1_yr3MOD <- lm(Sr~NAdd+Field,e1_yr3)
 summary(e1_yr3MOD)
-ggplot(e1_yr3,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()
+ggplot(e1_yr3,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()+labs(title="e1 yr 3")
 
 e1_yr10MOD <- lm(Sr~NAdd+Field,e1_yr10)
 summary(e1_yr10MOD)
-ggplot(e1_yr10,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()
+ggplot(e1_yr10,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()+labs(title="e1 yr 10")
 
 e1_yrmaxMOD <- lm(Sr~NAdd+Field,e1_yrmax)
 summary(e1_yrmaxMOD)
-ggplot(e1_yrmax,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()
+ggplot(e1_yrmax,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()+labs(title="e1 yr max***")
 
 
 
@@ -82,16 +82,16 @@ e2_yrmax <- e2[e2$ExpYear==max(e2$ExpYear),]
 
 e2_yr1MOD <- lm(Sr~NAdd+Field,e2_yr1)
 summary(e2_yr1MOD)
-ggplot(e2_yr1,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()
+ggplot(e2_yr1,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()+labs(title="e2 yr 1")
 
 e2_yr3MOD <- lm(Sr~NAdd+Field,e2_yr3)
 summary(e2_yr3MOD)
-ggplot(e2_yr3,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()
+ggplot(e2_yr3,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()+labs(title="e2 yr 3")
 
 e2_yr10MOD <- lm(Sr~NAdd+Field,e2_yr10)
 summary(e2_yr10MOD)
-ggplot(e2_yr10,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()
+ggplot(e2_yr10,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()+labs(title="e2 yr 10")
 
 e2_yrmaxMOD <- lm(Sr~NAdd+Field,e2_yrmax)
 summary(e2_yrmaxMOD)
-ggplot(e2_yrmax,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()
+ggplot(e2_yrmax,aes(NAdd,Sr,color=Field))+geom_smooth()+geom_point()+labs(title="e2 yr 1")
