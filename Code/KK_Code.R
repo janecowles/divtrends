@@ -13,13 +13,14 @@
 #### load libraries
 library(here)
 library(tidyr)
+library(lubridate)
 
 #### load data
 e001 <- read.csv(here("Data", "e001_dat.csv")) # Nitrogen addition, 82-present
 e002 <- read.csv(here("Data", "e002_dat.csv")) # Nitrogen addition, 82-present
 e003 <- read.csv(here("Data", "e003_dat.csv")) # Nitrogen and water addition, 82-91
 e005 <- read.csv(here("Data", "e005_dat.csv")) # Nitrogen addition and herbivory, 84-85
-e011 <- read.csv(here("Data", "e011_dat.csv")) # Nitrogen addition and herbivory, 84-92
+e011 <- read.csv(here("Data", "e011_dat.csv")) # Nitrogen addition, 84-92
 e098 <- read.csv(here("Data", "e098_dat.csv")) # Nitrogen addition and fire, 82-11
 e172 <- read.csv(here("Data", "e172_dat.csv")) # Nitrogen addition and herbivory, 82 - 11
 e244 <- read.csv(here("Data", "e244_dat.csv")) # Enemy removal, 08-16
@@ -32,13 +33,20 @@ e248 <- read.csv(here("Data", "e248_dat.csv")) # Nitrogen and water addition, 07
 # e001
 e001 <- e001[,c(1:5,7:9)]
 e001$Exp <- "e001"
-names(e001)[8] <- "SR" 
+names(e001)[8] <- "SR"
+e001$TrtYear <- e001$Year - min(e001$Year) + 1
 
 # e002
 e002$Exp <- "e002"
 e002 <- e002[,c(1:10,12,13)]
 names(e002) <- c("Exp", "Year", "Field", "Plot", "Subplot", "NTrt", "NAdd", "NCess",
                  "NTrtRec", "Burned", "SR", "Fenced")
+e002 <- e002[-which(is.na(e002$Year)),]
+e002$TrtYear <- e002$Year - 1981
+e002$FP <- paste(e002$Field,e002$Plot, sep = ".")
+e002sub <- e002[which(e002$NTrtRec == 0),14]
+e002sub <- unique(e002sub)
+test <- e002[(e002$FP %in% e002sub),]
 
 # e003
 e003$Year <- format(as.Date(as.character(e003$Sampling.date..MMDDYY.), format = "%m/%d/%Y"), "%Y")
@@ -87,6 +95,7 @@ names(e005) <- c("Field", "Exp", "Plot", "Fenced", "NTrt", "Year")
 
 # e011
 e011$Year <- substr(e011$Sampling.date..YYMMDD., 0, 2)
+e011$Year <- as.numeric(e011$Year) + 1900
 e011 <- e011[e011$Species.name != "Fungi" & e011$Species.name != "Misc. Litter" &
                e011$Species.name != "Miscellaneous Litter" & 
                e011$Species.name != "Mosses" & e011$Species.name != "Mosses & lichens" &
@@ -96,11 +105,14 @@ e011 <- spread(data=unique(e011[,c(1:5,7,13,14)]), key = Species.name, value = p
 e011$SR <- rowSums(e011[,c(7:length(e011))], na.rm = TRUE)
 e011 <- e011[,c(1:3,5,6,116)]
 names(e011) <- c("Field", "Exp", "Plot", "NTrt", "Year", "SR")
+e011$Exp <- "e011"
+e011$TrtYear <- e011$Year - min(e011$Year) + 1
 
 # e098
 # This one may be included in e002 data...
 ## These rates are added twice a year. Actual annual N addition is calculated as: 0.34%N * rate (g/m2) * 2 times/year
-e098$Year<- format(as.Date(as.character(e098$Sampling.date.mm.dd.yyyy.), format = "%m/%d/%y"),"%y")
+e098$Year<- (as.Date(as.character(e098$Sampling.date.mm.dd.yyyy.), format = "%m/%d/%y"))
+e098$Year <- year(e098$Year)
 e098 <- e098[e098$Species.Name != "Fungi" & e098$Species.Name != "Lichens" &
                e098$Species.Name != "Miscellaneous litter" & 
                e098$Species.Name != "Mosses" & e098$Species.Name != "Mosses & lichens" &
@@ -110,6 +122,8 @@ e098 <- spread(data=unique(e098[,c(1:3,5:8,10,11)]), key = Species.Name, value =
 e098$SR <- rowSums(e098[,c(8:length(e098))], na.rm = TRUE)
 e098 <- e098[,c(1:3,5:7, 104)]
 names(e098) <- c("Field", "Exp", "Plot", "NTrt", "Burned", "Year", "SR")
+e098$Exp <- "e098"
+e098$TrtYear <- e098$Year - min(e098$Year) + 1
 
 # e172
 # Sub experiment of 1?
@@ -120,6 +134,8 @@ e172 <- spread(data=unique(e172[,c(1:6,9,10,12)]), key = Species, value = presen
 e172$SR <- rowSums(e172[,c(8:length(e172))], na.rm = TRUE)
 e172 <- e172[,c(1:4,6,7,141)]
 names(e172)[5] <- "NTrt"
+e172$Exp <- "e172"
+e172$TrtYear <- e172$Year - min(e172$Year) + 1
 
 # e244
 e244 <- e244[e244$Species != " Fungi" & e244$Species != " Miscellaneous litter" & 
@@ -133,6 +149,7 @@ e244 <- spread(data=unique(e244[,-c(4,6)]), key = Species, value = present)
 e244$SR <- rowSums(e244[,c(5:length(e244))], na.rm = TRUE)
 e244 <- e244[,c(1:4,204)]
 e244$Exp <- tolower(e244$Exp)
+e244$TrtYear <- e244$Year - min(e244$Year) + 1
 
 # e245
 e245 <- e245[e245$Species != " Bare ground" & e245$Species != " Fungi" &
@@ -145,6 +162,7 @@ e245 <- spread(data=unique(e245[,-c(4,6)]), key = Species, value = present)
 e245$SR <- rowSums(e245[,c(5:length(e245))], na.rm = TRUE)
 e245 <- e245[,c(1:4,153)]
 e245$Exp <- tolower(e245$Exp)
+e245$TrtYear <- e245$Year - min(e245$Year) + 1
 
 # e247
 e247$Taxon <- tolower(e247$Taxon)
@@ -155,13 +173,14 @@ e247$present <- 1
 e247 <- spread(data=unique(e247[,c(1,4:7,9:13,15,23)]), key = Taxon, value = present)
 e247$SR <- rowSums(e247[,c(11:length(e247))], na.rm = TRUE)
 e247 <- e247[,c(1:10, 116)]
-names(e247) <- c("Year", "ExpYear", "Block", "Plot", "SubPlot", "N", "P", "K", "NTrt", "SR")
+names(e247) <- c("Year", "TrtYear", "Block", "Plot", "SubPlot", "N", "P", "K", "NTrt", "SR")
 e247$Exp <- "e247"
 
 # e248
 e248 <- e248[,c(1:4,6)]
 names(e248) <- c("Year", "Plot", "NTrt", "WaterTrt", "SR")
 e248$Exp <- "e248"
+e248$TrtYear <- e248$Year - min(e248$Year) + 1
 
 
 # Step 1: Find magnitude and direction of effect in year 1, 3 and 10 separately
