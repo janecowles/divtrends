@@ -11,22 +11,20 @@
 # Perhaps have a column for each treatment type and NA when that treatment is not applied in the experiment
 
 #### load libraries
-library(here)
 library(tidyr)
 library(lubridate)
+library(here)
+
 
 #### load data
-e001 <- read.csv(here("Data", "e001_dat.csv")) # Nitrogen addition, 82-present
-e002 <- read.csv(here("Data", "e002_dat.csv")) # Nitrogen addition, 82-present
-e003 <- read.csv(here("Data", "e003_dat.csv")) # Nitrogen and water addition, 82-91
-e005 <- read.csv(here("Data", "e005_dat.csv")) # Nitrogen addition and herbivory, 84-85
-e011 <- read.csv(here("Data", "e011_dat.csv")) # Nitrogen addition, 84-92
-e098 <- read.csv(here("Data", "e098_dat.csv")) # Nitrogen addition and fire, 82-11
-e172 <- read.csv(here("Data", "e172_dat.csv")) # Nitrogen addition and herbivory, 82 - 11
-e244 <- read.csv(here("Data", "e244_dat.csv")) # Enemy removal, 08-16
-e245 <- read.csv(here("Data", "e245_dat.csv")) # Enemy removal, 08-16
-e247 <- read.csv(here("Data", "e247_dat.csv")) # Nitrogen addition and herbivory, 07 - 15
-e248 <- read.csv(here("Data", "e248_dat.csv")) # Nitrogen and water addition, 07-16
+e001 <- read.csv(here::here("Data", "e001_dat.csv")) # Nitrogen addition, 82-present
+e002 <- read.csv(here::here("Data", "e002_dat.csv")) # Nitrogen addition, 82-present
+e011 <- read.csv(here::here("Data", "e011_dat.csv")) # Nitrogen addition, 84-92
+e098 <- read.csv(here::here("Data", "e098_dat.csv")) # Nitrogen addition and fire, 82-11
+e172 <- read.csv(here::here("Data", "e172_dat.csv")) # Nitrogen addition and herbivory, 82 - 11
+e245 <- read.csv(here::here("Data", "e245_dat.csv")) # Enemy removal, 08-16
+e247 <- read.csv(here::here("Data", "e247_dat.csv")) # Nitrogen addition and herbivory, 07 - 15
+e248 <- read.csv(here::here("Data", "e248_dat.csv")) # Nitrogen and water addition, 07-16
 
 # Need all column names to be the same for combining the datasets
 # e003 - e247 do not have a species richness column either - making that, too
@@ -35,6 +33,7 @@ e001 <- e001[,c(1:5,7:9)]
 e001$Exp <- "e001"
 names(e001)[8] <- "SR"
 e001$TrtYear <- e001$Year - min(e001$Year) + 1
+
 
 # e002
 e002$Exp <- "e002"
@@ -47,51 +46,6 @@ e002$FP <- paste(e002$Field,e002$Plot, sep = ".")
 e002sub <- e002[which(e002$NTrtRec == 0),14]
 e002sub <- unique(e002sub)
 test <- e002[(e002$FP %in% e002sub),]
-
-# e003
-e003$Year <- format(as.Date(as.character(e003$Sampling.date..MMDDYY.), format = "%m/%d/%Y"), "%Y")
-e003$Species.Name <- tolower(e003$Species.Name)
-e003 <- e003[e003$Species.Name != "miscellaneous litter" & e003$Species.Name != "misellaneous litter" &
-               e003$Species.Name != "fungi" & e003$Species.Name != "mosses & lichens" &
-               e003$Species.Name != "alive" & e003$Species.Name != "mosses" & 
-               e003$Species.Name != "mosses lichens" ,]
-e003$present <- 1
-e003 <- spread(data=e003[,c(1:4,6,12,13)], key = Species.Name, value = present)
-e003$SR <- rowSums(e003[,c(6:length(e003))], na.rm = TRUE)
-e003 <- e003[,c(1:5,111)]
-names(e003) <- c("Field", "Exp", "Plot", "Treatment", "Year", "SR")
-
-# Treatment Codes
-# A	20 g/m2 NH4NO3
-# B	35 g/m2 NaH2PO4-H2O + 35 g/m2 Na2HPO4
-# C	87 g/m2 K2SO4
-# D	75 g/m2 CaCO3
-# E	60 g/m2 MgSO4
-# F	71 g/m2 Na2SO4
-# G	60 ml/m2 trace metal sand*
-# H	4 gal/m2/week H2O
-# I	no nutrients added
-
-# e005
-e005$Species.Name <- tolower(e005$Species.Name)
-e005 <- e005[e005$Species.Name != "miscellaneous litter" &
-               e005$Species.Name != "fungi" &  e005$Species.Name != "mosses",]
-e005$present <- 1
-e005 <- spread(data=unique(e005[,c(1,2,3,4,5,6,7,10,15)]), key = Species.Name, value = present)
-e005$SR <- rowSums(e005[,c(8:length(e005))], na.rm = TRUE)
-e005 <- e005[,c(1:4,6,7, 102)]
-names(e005) <- c("Field", "Exp", "Plot", "Fenced", "NTrt", "Year")
-
-# Nitrgoen added at ammonium nitrate and numbers are g/m2/y
-# Fence treatment codes
-#1 = All excluded,
-#2=Voles excluded,
-#3=Foliage-feeding insects excluded,
-#4=Gophers excluded,
-#5=Fenced control,
-#6=Control-no treatment,
-#7=Below-ground invertebrates excluded,
-#8=Control-no treatment
 
 # e011
 e011$Year <- substr(e011$Sampling.date..YYMMDD., 0, 2)
@@ -107,11 +61,13 @@ e011 <- e011[,c(1:3,5,6,116)]
 names(e011) <- c("Field", "Exp", "Plot", "NTrt", "Year", "SR")
 e011$Exp <- "e011"
 e011$TrtYear <- e011$Year - min(e011$Year) + 1
+e011$NAdd <- 1
 
 # e098
 # This one may be included in e002 data...
 ## These rates are added twice a year. Actual annual N addition is calculated as: 0.34%N * rate (g/m2) * 2 times/year
 e098$Year<- (as.Date(as.character(e098$Sampling.date.mm.dd.yyyy.), format = "%m/%d/%y"))
+library(lubridate)
 e098$Year <- year(e098$Year)
 e098 <- e098[e098$Species.Name != "Fungi" & e098$Species.Name != "Lichens" &
                e098$Species.Name != "Miscellaneous litter" & 
@@ -124,6 +80,7 @@ e098 <- e098[,c(1:3,5:7, 104)]
 names(e098) <- c("Field", "Exp", "Plot", "NTrt", "Burned", "Year", "SR")
 e098$Exp <- "e098"
 e098$TrtYear <- e098$Year - min(e098$Year) + 1
+e098$NAdd <- 1
 
 # e172
 # Sub experiment of 1?
@@ -136,20 +93,6 @@ e172 <- e172[,c(1:4,6,7,141)]
 names(e172)[5] <- "NTrt"
 e172$Exp <- "e172"
 e172$TrtYear <- e172$Year - min(e172$Year) + 1
-
-# e244
-e244 <- e244[e244$Species != " Fungi" & e244$Species != " Miscellaneous litter" & 
-               e244$Species != " Mosses & lichens" & e244$Species != "Bare" & 
-               e244$Species != "Bare ground" & e244$Species != "bareground" &
-               e244$Species != "Miscellaneous litter" & e244$Species != "Moss" &
-               e244$Species != "Mosses" & e244$Species != "Mosses 2" &
-               e244$Species != "Mosses 3",]
-e244$present <- 1
-e244 <- spread(data=unique(e244[,-c(4,6)]), key = Species, value = present)
-e244$SR <- rowSums(e244[,c(5:length(e244))], na.rm = TRUE)
-e244 <- e244[,c(1:4,204)]
-e244$Exp <- tolower(e244$Exp)
-e244$TrtYear <- e244$Year - min(e244$Year) + 1
 
 # e245
 e245 <- e245[e245$Species != " Bare ground" & e245$Species != " Fungi" &
@@ -172,15 +115,30 @@ e247 <- e247[e247$Taxon != "fungi sp." & e247$Taxon != "ground" &
 e247$present <- 1
 e247 <- spread(data=unique(e247[,c(1,4:7,9:13,15,23)]), key = Taxon, value = present)
 e247$SR <- rowSums(e247[,c(11:length(e247))], na.rm = TRUE)
-e247 <- e247[,c(1:10, 116)]
-names(e247) <- c("Year", "TrtYear", "Block", "Plot", "SubPlot", "N", "P", "K", "NTrt", "SR")
+# Subset out only N addition treatments
+e247 <- e247[e247$P == 0 & e247$K == 0 & e247$Exclose == 0,]
+e247 <- e247[,c(1:6,10, 116)]
+names(e247) <- c("Year", "TrtYear", "Block", "Plot", "SubPlot", "NAdd", "NTrt", "SR")
 e247$Exp <- "e247"
+e247$NAdd <- 1 # Need NAdd column to indicate N addition experiment
+
+# Get rid of P K columns
+e247 <- e247[,-c(7,8)]
+
+
 
 # e248
 e248 <- e248[,c(1:4,6)]
 names(e248) <- c("Year", "Plot", "NTrt", "WaterTrt", "SR")
+e248$NTrt <- as.character(e248$NTrt)
+e248[e248$NTrt == "A",] <- 0
+e248[e248$NTrt == "B",] <- 7
+e248[e248$NTrt == "C",] <- 14
 e248$Exp <- "e248"
 e248$TrtYear <- e248$Year - min(e248$Year) + 1
+e248$NAdd <- 1
+
+## Combine datasets
 
 
 # Step 1: Find magnitude and direction of effect in year 1, 3 and 10 separately
