@@ -151,12 +151,13 @@ e248$NAdd <- ifelse(e248$NTrt == 0, 0,1)
 
 ## Combine datasets
 dfs <- list(e001, e002, e011, e098, e172, e245, e247, e248)
-<<<<<<< HEAD
+# <<<<<<< HEAD
 findat <- bind_rows(dfs)
-write.csv(dat.fin, here::here("Data", "findat.csv"))
-=======
+# =======
 dat.fin <- bind_rows(dfs)
->>>>>>> f5743c2f72afbda29f8b8626bdf860647359deb8
+write.csv(dat.fin, here::here("Data", "findat.csv"))
+
+# >>>>>>> f5743c2f72afbda29f8b8626bdf860647359deb8
 ## Column names are as follows
 # Year - the actual calendar year ; Field - field letter where applicable
 # Plot - numeric plot; NTrt - magnitude of nitrogen addition (g/m2/year)
