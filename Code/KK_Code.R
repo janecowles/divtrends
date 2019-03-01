@@ -141,7 +141,7 @@ e247$NAdd <- ifelse(e247$NTrt == 0, 0,1) # Need NAdd column to indicate N additi
 e248 <- e248[,c(1:4,6)]
 names(e248) <- c("Year", "Plot", "NTrt", "Water", "SR")
 e248$NTrt <- as.character(e248$NTrt)
-e248$NTrt[e248$NTrt == "A"] <- 0 #this was e248[e248$...] which changed everything to 0 7 or 14, i changed to e248$NTrt[e248$...] so just changes NTrt
+e248$NTrt[e248$NTrt == "A"] <- 0 
 e248$NTrt[e248$NTrt == "B"] <- 7
 e248$NTrt[e248$NTrt == "C"] <- 14
 e248$NTrt <- as.numeric(e248$NTrt)
@@ -151,13 +151,13 @@ e248$NAdd <- ifelse(e248$NTrt == 0, 0,1)
 
 ## Combine datasets
 dfs <- list(e001, e002, e011, e098, e172, e245, e247, e248)
-# <<<<<<< HEAD
+
 findat <- bind_rows(dfs)
-# =======
+
 dat.fin <- bind_rows(dfs)
+
 write.csv(dat.fin, here::here("Data", "findat.csv"))
 
-# >>>>>>> f5743c2f72afbda29f8b8626bdf860647359deb8
 ## Column names are as follows
 # Year - the actual calendar year ; Field - field letter where applicable
 # Plot - numeric plot; NTrt - magnitude of nitrogen addition (g/m2/year)

@@ -15,7 +15,7 @@ library(ggplot2)
 findat <- read.csv(here::here("Data", "findat.csv"))
 findat$NAdd<-as.factor(findat$NAdd)
 #removing e098, e172 bc subsets of e001 and e002 therefore repetitive. removing e245 (for now!!!) because no n, removing e011 because uneven sampling?
-df_n <- findat[findat$Exp%in%c("e001", "e002",  "e247", "e248")&!is.na(findat$SR),]
+df_n <- findat[findat$Exp%in%c("e001", "e002", "e247", "e248")&!is.na(findat$SR),]
 df_n$Exp <- factor(df_n$Exp)
 # df_n[is.na(df_n$NAdd),]
 # df_n[is.na(df_n$SR),]
