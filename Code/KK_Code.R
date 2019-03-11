@@ -43,7 +43,7 @@ e001$Burned <- ifelse(e001$Burned =="n", 0, 1)
 e002$Exp <- "e002"
 e002$FP <- paste(e002$Field,e002$Plot, sep = ".")
 # Get only continuously fertilized plots
-plotlist <- factor(e002$FP[e002$Year==2013 & e002$NtrtRec==1 & e002$BurnTrt==0])
+plotlist <- factor(e002$FP[e002$Year==1992 & e002$NtrtRec==1 & e002$BurnTrt==0])
 e002 <-e002[e002$FP %in% plotlist,]
 # Get rid of Ntrt 9
 e002 <- e002[e002$Ntrt != 9,]
