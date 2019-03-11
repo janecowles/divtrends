@@ -10,6 +10,7 @@ library(here)
 library(data.table)
 library(nlme)
 library(ggplot2)
+library(car)
 
 #read file in or run kk_code
 findat <- read.csv(here::here("Data", "findat.csv"))
@@ -27,6 +28,8 @@ df_n$N_group<-factor(df_n$N_group,levels=c("None","Low","Med","High"))
 
 ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3"))
 ggplot(df_n,aes(TrtYear,SR,group=NAdd,color=NAdd))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3"))
+
+ggplot(df_n,aes(TrtYear,SR,group=N_group,color=N_group))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3","yellow","red"))
 
 ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(Field~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
 
@@ -71,6 +74,7 @@ summary(yr1_mod_b)
 
 sum_mod_d <- lme(SR~N_group*TimePd,random=~1|factor(Plot), data=df_sum[df_sum$Exp=="e001"&df_sum$Field=="D",])
 summary(sum_mod_d)
+Anova(sum_mod_d)
 
 ggplot(df_sum[df_sum$Exp=="e001"&df_sum$Field=="D",],aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+labs(title = "Field D")
 
