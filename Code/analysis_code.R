@@ -20,32 +20,97 @@ df_n$Exp <- factor(df_n$Exp)
 # df_n[is.na(df_n$NAdd),]
 # df_n[is.na(df_n$SR),]
 
+df_n$N_group <- factor(ifelse(df_n$NTrt==0,"None",ifelse(df_n$NTrt<5,"Low",ifelse(df_n$NTrt<10,"Med","High"))))
+df_n$N_group<-factor(df_n$N_group,levels=c("None","Low","Med","High"))
+
 #think about fencing and burning!
 
 ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3"))
 ggplot(df_n,aes(TrtYear,SR,group=NAdd,color=NAdd))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3"))
 
+ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(Field~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
+
+ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(Exp~Field)+scale_color_manual(values=c("darkblue","cyan3"))
+
+ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=NTrt,color=NTrt))+geom_line(stat="summary",size=1.5)+facet_grid(Exp~Field)#+scale_color_manual(values=c("darkblue","cyan3"))
+
+ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=N_group,color=N_group))+geom_line(stat="summary",size=1.5)+facet_grid(Exp~Field)#+scale_color_manual(values=c("darkblue","cyan3"))
+
+
+
 ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(1~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
+
+
 ggplot(df_n,aes(TrtYear,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(1~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
+
 setDT(df_n)
 df_n_first <- df_n[df_n$TrtYear==1,]
-df_n_first <-df_n_first[,.(SR=mean(SR,na.rm=T)),by=.(Exp,Field,Plot,NTrt,NAdd,Subplot,Block,Water)]
+df_n_first <-df_n_first[,.(SR=mean(SR,na.rm=T)),by=.(Exp,Field,Plot,NTrt,NAdd,N_group,Subplot,Block,Water)]
 df_n_first$TimePd <- "First"
 df_n_early <- df_n[df_n$TrtYear%in%c(3:4),]
-df_n_earlyAve <- df_n_early[,.(SR=mean(SR,na.rm=T)),by=.(Exp,Field,Plot,NTrt,NAdd,Subplot,Block,Water)]
+df_n_earlyAve <- df_n_early[,.(SR=mean(SR,na.rm=T)),by=.(Exp,Field,Plot,NTrt,NAdd,N_group,Subplot,Block,Water)]
 df_n_earlyAve$TimePd <- "Early"
 df_n_later <- df_n[df_n$TrtYear%in%c(8:10),]
-df_n_laterAve <- df_n_later[,.(SR=mean(SR,na.rm=T)),by=.(Exp,Field,Plot,NTrt,NAdd,Subplot,Block,Water)]
+df_n_laterAve <- df_n_later[,.(SR=mean(SR,na.rm=T)),by=.(Exp,Field,Plot,NTrt,NAdd,N_group,Subplot,Block,Water)]
 df_n_laterAve$TimePd <- "Later"
+
+
+df_sum <- rbind(df_n_first,df_n_earlyAve,df_n_laterAve)
+df_sum$TimePd<-factor(df_sum$TimePd,levels=c("First","Early","Later"))
+
+ggplot(df_sum,aes(TimePd,SR,color=NAdd,group=NAdd))+geom_point()+geom_line(stat="summary")
+
+ggplot(df_sum,aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")
+
+### aside about field d
+yr1_mod_d <- lm(SR~N_group, data=df_n_first[df_n_first$Exp=="e001"&df_n_first$Field=="D",])
+summary(yr1_mod_d)
+
+yr1_mod_b <- lm(SR~N_group, data=df_n_first[df_n_first$Exp=="e001"&df_n_first$Field=="B",])
+summary(yr1_mod_b)
+
+sum_mod_d <- lme(SR~N_group*TimePd,random=~1|factor(Plot), data=df_sum[df_sum$Exp=="e001"&df_sum$Field=="D",])
+summary(sum_mod_d)
+
+ggplot(df_sum[df_sum$Exp=="e001"&df_sum$Field=="D",],aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+labs(title = "Field D")
+
+ggplot(df_sum[df_sum$Exp=="e001",],aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+facet_wrap(facets = "Field")
+
+ggplot(df_sum,aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+facet_wrap(facets = "Field")
+
+ggplot(df_sum,aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+facet_grid(Exp~Field)
+
+
+
+yr1_mod <- lm(SR~N_group+Exp, data=df_n_first)
+summary(yr1_mod)
+
+early_mod <- lm(SR~N_group+Exp, data=df_n_earlyAve)
+summary(early_mod)
+
+later_mod <- lm(SR~N_groupExp, data=df_n_laterAve)
+summary(later_mod)
+
+
+
+
+
+
+
+
+
 
 
 #ok i added in this "superlater" stuff for the last many years of e001 and e002 but this is treading on another paper of mine and not relevant to this paper. It also leads to an unbalanced design -- i picked the last 3 groups bc there was a balance across experiments across time, this is only e001 and e002.
 
 df_n_superlater <- df_n[df_n$TrtYear%in%c(30:37),]
-df_n_superlaterAve <- df_n_superlater[,.(SR=mean(SR,na.rm=T)),by=.(Exp,Field,Plot,NTrt,NAdd,Subplot,Block,Water)]
+df_n_superlaterAve <- df_n_superlater[,.(SR=mean(SR,na.rm=T)),by=.(Exp,Field,Plot,NTrt,NAdd,N_group,Subplot,Block,Water)]
 df_n_superlaterAve$TimePd <- "SuperLater"
 
 df_sum <- rbind(df_n_first,df_n_earlyAve,df_n_laterAve,df_n_superlaterAve)
 df_sum$TimePd<-factor(df_sum$TimePd,levels=c("First","Early","Later","SuperLater"))
 
 ggplot(df_sum,aes(TimePd,SR,color=NAdd,group=NAdd))+geom_point()+geom_line(stat="summary")
+
+ggplot(df_sum,aes(TimePd,SR,color=NTrt,group=NTrt))+geom_point()+geom_line(stat="summary")
+
