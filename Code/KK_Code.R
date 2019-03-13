@@ -38,12 +38,13 @@ e001$NTrt <- e001$NAdd
 e001$NAdd <- ifelse(e001$NTrt == 0, 0, 1)
 e001$Fenced <- ifelse(e001$Fenced == "n", 0, 1)
 e001$Burned <- ifelse(e001$Burned =="n", 0, 1)
+e001$NPK <- "Other"
 
 # e002
 e002$Exp <- "e002"
 e002$FP <- paste(e002$Field,e002$Plot, sep = ".")
 # Get only continuously fertilized plots
-plotlist <- factor(e002$FP[e002$Year==1992 & e002$NtrtRec==1 & e002$BurnTrt==0])
+plotlist <- factor(e002$FP[e002$Year==1992 & e002$NtrtRec==1])#removed burn removing
 e002 <-e002[e002$FP %in% plotlist,]
 # Get rid of Ntrt 9
 e002 <- e002[e002$Ntrt != 9,]
@@ -53,6 +54,7 @@ names(e002) <- c("Exp", "Year", "Field", "Plot", "Subplot", "NTrt", "NAdd",
 e002$TrtYear <- e002$Year - 1981
 e002$NTrt <- e002$NAdd
 e002$NAdd <- ifelse(e002$NTrt == 0, 0, 1)
+e002$NPK <- "Other"
 
 # e011
 e011$Year <- substr(e011$Sampling.date..YYMMDD., 0, 2)
@@ -70,7 +72,7 @@ e011$Exp <- "e011"
 e011$TrtYear <- e011$Year - min(e011$Year) + 1
 e011$NAdd <- ifelse(e011$NTrt == 0, 0, 1)
 e011$NTrt <- e011$NTrt *.34 # Get amount of N added
-
+e011$NPK <- "Other"
 # e098
 # Subset of e002 - burning treatments
 e098$Year<- (as.Date(as.character(e098$Sampling.date.mm.dd.yyyy.), format = "%m/%d/%y"))
@@ -151,7 +153,7 @@ e248$NTrt <- as.numeric(e248$NTrt)
 e248$Exp <- "e248"
 e248$TrtYear <- e248$Year - min(e248$Year) + 1
 e248$NAdd <- ifelse(e248$NTrt == 0, 0,1)
-
+e248$NPK <- "Other"
 ## Combine datasets
 dfs <- list(e001, e002, e011, e098, e172, e245, e247, e248)
 

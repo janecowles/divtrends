@@ -15,9 +15,10 @@ library(car)
 #read file in or run kk_code
 findat <- read.csv(here::here("Data", "findat.csv"))
 findat$NAdd<-as.factor(findat$NAdd)
+findat$NPK[is.na(findat$NPK)]<-"Other"
 #removing e098, e172 bc subsets of e001 and e002 therefore repetitive. removing e245 (for now!!!) because no n, removing e011 because uneven sampling?
 # df_n <- findat[findat$Exp%in%c("e001", "e002", "e247", "e248")&!is.na(findat$SR),]
- df_n <- findat[findat$Exp%in%c("e001", "e002")&!is.na(findat$SR),]
+ df_n <- findat[findat$Exp%in%c("e001", "e002","e247","e248")&!is.na(findat$SR),]
  df_n <- df_n[df_n$NPK!="NPK"&df_n$TrtYear>0,]
 #missing data for fencing. e002 says (cdr methods) all fences removed in 2004.
 df_n$Fenced[df_n$Exp=="e002"&df_n$Year>2004]<-0
@@ -32,9 +33,8 @@ df_n$N_group<-factor(df_n$N_group,levels=c("None","Low","Med","High"))
 #think about fencing and burning!
 ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3"))+facet_grid(Burned~Fenced)
 
-ggplot(df_n,aes(Year,SR,group=NAdd,color=Field))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3","yellow","red"))+facet_grid(Burned~Fenced,labeller = label_both)
+ggplot(df_n,aes(Year,SR,group=NAdd,color=Exp))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3","yellow","red"))+facet_grid(Burned~Fenced,labeller = label_both)
 
-ggplot(df_n[df_n$NTrt>0,],aes(Year,SR))+geom_point()+geom_smooth(se=F)
 
 
 
@@ -52,13 +52,11 @@ ggplot(df_n,aes(Year,SR,group=NAdd,color=Exp))+geom_point()+geom_smooth(se=F)+fa
 ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3"))
 ggplot(df_n,aes(TrtYear,SR,group=NAdd,color=NAdd))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3"))
 
-ggplot(df_n,aes(TrtYear,SR,group=N_group,color=N_group))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3","yellow","red"))
 
 ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(Field~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
 
 ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(Exp~Field)+scale_color_manual(values=c("darkblue","cyan3"))
 
-ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=NTrt,color=NTrt))+geom_line(stat="summary",size=1.5)+facet_grid(Exp~Field)#+scale_color_manual(values=c("darkblue","cyan3"))
 
 ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=N_group,color=N_group))+geom_line(stat="summary",size=1.5)+facet_grid(Exp~Field)#+scale_color_manual(values=c("darkblue","cyan3"))
 
@@ -84,9 +82,6 @@ df_n_laterAve$TimePd <- "Later"
 df_sum <- rbind(df_n_first,df_n_earlyAve,df_n_laterAve)
 df_sum$TimePd<-factor(df_sum$TimePd,levels=c("First","Early","Later"))
 
-ggplot(df_sum,aes(TimePd,SR,color=NAdd,group=NAdd))+geom_point()+geom_line(stat="summary")
-
-ggplot(df_sum,aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")
 
 ### aside about field d
 yr1_mod_d <- lm(SR~N_group, data=df_n_first[df_n_first$Exp=="e001"&df_n_first$Field=="D",])
@@ -100,13 +95,6 @@ summary(sum_mod_d)
 Anova(sum_mod_d)
 
 ggplot(df_sum[df_sum$Exp=="e001"&df_sum$Field=="D",],aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+labs(title = "Field D")
-
-ggplot(df_sum[df_sum$Exp=="e001",],aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+facet_wrap(facets = "Field")
-
-ggplot(df_sum,aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+facet_wrap(facets = "Field")
-
-ggplot(df_sum,aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+facet_grid(Exp~Field)
-
 
 
 yr1_mod <- lm(SR~N_group+Exp, data=df_n_first)
@@ -125,6 +113,10 @@ summary(yr1_mod_d)
 
 
 
+####USE FOR SPRING FLING?
+ggplot(df_n,aes(TrtYear,SR,group=N_group,color=N_group))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3","orange","red"))
+ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=N_group,color=N_group))+geom_line(stat="summary",size=1.5)+facet_grid(Exp~Field)+scale_color_manual(values=c("darkblue","cyan3","orange","red"))
+ggplot(df_sum[df_sum$Exp%in%c("e001","e002")],aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+facet_grid(Exp~Field)+scale_color_manual(values=c("darkblue","cyan3","orange","red"))
 
 
 
@@ -155,10 +147,16 @@ e247$NAdd[e247$NPK=="Other"]<-NA
 df_f <- rbind(e001,e247)
 df_f <- df_f[!is.na(df_f$NAdd),]
 df_f$ExpPlot <- as.factor(paste0(df_f$Exp,df_f$Plot))
-ggplot(df_f,aes(TrtYear,SR,group=factor(Fenced),color=factor(Fenced)))+geom_smooth()+facet_grid(Exp~NAdd)
 
-df_f_mod <- lme(SR~NAdd*factor(Fenced),random=~1|ExpPlot,data=df_f)
+####USE FOR SPRING FLING?
+ggplot(df_f,aes(TrtYear,SR,group=factor(Fenced),color=factor(Fenced)))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(Exp~NAdd)+scale_color_manual(values=c("darkblue","cyan3"))
+ggplot(df_f,aes(TrtYear,SR,group=factor(Fenced),color=factor(Fenced)))+geom_line(stat="summary",size=1.5)+facet_grid(Exp~NAdd)+scale_color_manual(values=c("darkblue","cyan3"))
+
+
+df_f_mod <- lme(SR~TrtYear*NAdd*factor(Fenced),random=~1|ExpPlot,data=df_f)
 summary(df_f_mod)
-
-df_f_mod <- lm(SR~NAdd*factor(Fenced),data=df_f[df_f$TrtYear==1,])
+Anova(df_f_mod)
+df_f_mod1 <- lm(SR~NAdd*factor(Fenced),data=df_f[df_f$TrtYear==1,])
+summary(df_f_mod1)
+Anova(df_f_mod1)
 
