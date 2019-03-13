@@ -129,12 +129,15 @@ e247 <- e247[e247$Taxon != "fungi sp." & e247$Taxon != "ground" &
 e247$present <- 1
 e247 <- spread(data=unique(e247[,c(1,4:7,9:13,15,23)]), key = Taxon, value = present)
 e247$SR <- rowSums(e247[,c(11:length(e247))], na.rm = TRUE)
-# Subset out only N addition treatments
-e247 <- e247[e247$P == 0 & e247$K == 0 & e247$Exclose == 0,]
-e247 <- e247[,c(1:6,10, 116)]
-names(e247) <- c("Year", "TrtYear", "Block", "Plot", "Subplot", "NAdd", "NTrt", "SR")
+# Subset out only N addition treatments -- changed to look at fencing!
+# e247 <- e247[e247$P == 0 & e247$K == 0 & e247$Exclose == 0,]
+e247$Fenced <- e247$Exclose
+e247$NPK <- as.factor(ifelse(e247$N==1&e247$P==1&e247$K==1,"NPK",ifelse(e247$N==0&e247$K==0&e247$P==0,"None","Other")))
+
+e247 <- e247[,c(1:6,10, 116:118)]
+names(e247) <- c("Year", "TrtYear", "Block", "Plot", "Subplot", "NAdd", "NTrt", "SR","Fenced","NPK")
 e247$Exp <- "e247"
-e247$NAdd <- ifelse(e247$NTrt == 0, 0,1) # Need NAdd column to indicate N addition experiment
+# e247$NAdd <- ifelse(e247$NTrt == 0, 0,1) # Need NAdd column to indicate N addition experiment
 
 
 # e248
