@@ -18,7 +18,7 @@ findat$NAdd<-as.factor(findat$NAdd)
 #removing e098, e172 bc subsets of e001 and e002 therefore repetitive. removing e245 (for now!!!) because no n, removing e011 because uneven sampling?
 # df_n <- findat[findat$Exp%in%c("e001", "e002", "e247", "e248")&!is.na(findat$SR),]
  df_n <- findat[findat$Exp%in%c("e001", "e002")&!is.na(findat$SR),]
-
+ df_n <- df_n[df_n$NPK!="NPK"&df_n$TrtYear>0,]
 #missing data for fencing. e002 says (cdr methods) all fences removed in 2004.
 df_n$Fenced[df_n$Exp=="e002"&df_n$Year>2004]<-0
 
