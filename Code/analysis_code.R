@@ -43,8 +43,8 @@ summary(df_n[df_n$Exp=="e002",])
 table(df_n$Fenced,df_n$Year,df_n$Field,df_n$Exp)
 
 ggplot(df_n,aes(Year,SR,group=NAdd,color=Exp))+geom_point()+geom_smooth(se=F)+facet_grid(Burned~Fenced)
-ggplot(df_n,aes(Year,SR,group=NAdd,color=Exp))+geom_point()+geom_smooth(se=F)+facet_grid(1~Fenced)
-ggplot(df_n,aes(Year,SR,group=NAdd,color=Exp))+geom_point()+geom_smooth(se=F)+facet_grid(1~Burned)
+ggplot(df_n,aes(Year,SR,group=NAdd,color=Exp))+geom_point()+geom_smooth(se=F)+facet_grid(~Fenced)
+ggplot(df_n,aes(Year,SR,group=NAdd,color=Exp))+geom_point()+geom_smooth(se=F)+facet_grid(~Burned)
 
 
 
@@ -62,10 +62,10 @@ ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=N_group,color=N_gro
 
 
 
-ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(1~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
+ggplot(df_n,aes(Year,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
 
 
-ggplot(df_n,aes(TrtYear,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(1~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
+ggplot(df_n,aes(TrtYear,SR,group=NAdd,color=NAdd))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(~Exp)+scale_color_manual(values=c("darkblue","cyan3"))
 
 setDT(df_n)
 df_n_first <- df_n[df_n$TrtYear==1,]
@@ -103,7 +103,7 @@ summary(yr1_mod)
 early_mod <- lm(SR~N_group+Exp, data=df_n_earlyAve)
 summary(early_mod)
 
-later_mod <- lm(SR~N_groupExp, data=df_n_laterAve)
+later_mod <- lm(SR~N_group+Exp, data=df_n_laterAve)
 summary(later_mod)
 
 
@@ -114,9 +114,63 @@ summary(yr1_mod_d)
 
 
 ####USE FOR SPRING FLING?
-ggplot(df_n,aes(TrtYear,SR,group=N_group,color=N_group))+geom_point()+geom_smooth(se=F)+scale_color_manual(values=c("darkblue","cyan3","orange","red"))
-ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=N_group,color=N_group))+geom_line(stat="summary",size=1.5)+facet_grid(Exp~Field)+scale_color_manual(values=c("darkblue","cyan3","orange","red"))
-ggplot(df_sum[df_sum$Exp%in%c("e001","e002")],aes(TimePd,SR,color=N_group,group=N_group))+geom_point()+geom_line(stat="summary")+facet_grid(Exp~Field)+scale_color_manual(values=c("darkblue","cyan3","orange","red"))
+ggplot(df_n,aes(TrtYear,SR,group=N_group,color=N_group))+
+  geom_point(alpha= 0.5)+
+  geom_smooth(se=F, size = 2)+
+  scale_color_manual(values=c("grey","cyan3","orange","red")) +
+  theme_classic() + 
+  labs(x = "Treatment Year", y = "Species Richness", color = "Nitrogen \nlevel") +
+  xlim(c(1,37)) +
+  theme(axis.title = element_text(size = 18, face = "bold", color = "white"), 
+        legend.title = element_text(size = 18, face = "bold",  color = "white"),
+        axis.text = element_text(size = 16, face = "bold", color = "white"),
+        plot.background = element_rect(fill = "black",colour = "black"),
+        axis.line = element_line(color = "white"),
+        panel.background = element_rect(fill = "black", color = "black"), 
+        legend.background = element_rect(fill = "black", color = "black"),
+        legend.text = element_text(size = 16, face = "bold", color = "white"))
+
+
+ggplot(df_n[df_n$Exp%in%c("e001","e002"),],aes(Year,SR,group=N_group,color=N_group))+
+  geom_line(stat="summary",size=1.5)+
+  facet_grid(Exp~Field)+
+  scale_color_manual(values=c("grey","cyan3","orange","red")) + 
+  theme_linedraw()+
+  labs(x = "Year", y = "Species Richness", color = "Nitrogen \nlevel") +
+  theme(axis.title = element_text(size = 20, face = "bold", color = "white"), 
+        legend.title = element_text(size = 20, face = "bold",  color = "white"),
+        axis.text = element_text(size = 16, face = "bold", color = "white"),
+        plot.background = element_rect(fill = "black",colour = "black"),
+        axis.line = element_line(color = "white"),
+        panel.background = element_rect(fill = "black", color = "black"), 
+        legend.background = element_rect(fill = "black", color = "black"),
+        legend.text = element_text(size = 16, face = "bold", color = "white"),
+        panel.border = element_rect(fill = NA, linetype = 1, color = "white"),
+        axis.text.x = element_text(angle = 30, hjust = 1),
+        strip.text = element_text(size = 16, face = "bold", color = "black"), 
+        strip.background = element_rect(fill = "white", color = "white"), 
+        legend.key = element_rect(fill = "black", color = "black"))
+
+ggplot(df_sum[df_sum$Exp%in%c("e001","e002")],aes(TimePd,SR,color=N_group,group=N_group))+
+  geom_point()+
+  geom_line(stat="summary")+
+  facet_grid(Exp~Field)+
+  scale_color_manual(values=c("grey","cyan3","orange","red")) +
+  theme_linedraw()+
+  labs(x = "Time Period", y = "Species Richness", color = "Nitrogen \nlevel") +
+  theme(axis.title = element_text(size = 20, face = "bold", color = "white"), 
+        legend.title = element_text(size = 20, face = "bold",  color = "white"),
+        axis.text = element_text(size = 16, face = "bold", color = "white"),
+        plot.background = element_rect(fill = "black",colour = "black"),
+        axis.line = element_line(color = "white"),
+        panel.background = element_rect(fill = "black", color = "black"), 
+        legend.background = element_rect(fill = "black", color = "black"),
+        legend.text = element_text(size = 16, face = "bold", color = "white"),
+        panel.border = element_rect(fill = NA, linetype = 1, color = "white"),
+        axis.text.x = element_text(angle = 30, hjust = 1),
+        strip.text = element_text(size = 16, face = "bold", color = "black"), 
+        strip.background = element_rect(fill = "white", color = "white"), 
+        legend.key = element_rect(fill = "black", color = "black"))
 
 
 
@@ -147,9 +201,34 @@ e247$NAdd[e247$NPK=="Other"]<-NA
 df_f <- rbind(e001,e247)
 df_f <- df_f[!is.na(df_f$NAdd),]
 df_f$ExpPlot <- as.factor(paste0(df_f$Exp,df_f$Plot))
+df_f$Fenced <- factor(df_f$Fenced)
+levels(df_f$Fenced) <- c("None", "Fenced")
+levels(df_f$NAdd) <- c("None", "+N")
 
 ####USE FOR SPRING FLING?
-ggplot(df_f,aes(TrtYear,SR,group=factor(Fenced),color=factor(Fenced)))+geom_point()+geom_line(stat="summary",size=1.5)+facet_grid(Exp~NAdd)+scale_color_manual(values=c("darkblue","cyan3"))
+ggplot(df_f,aes(TrtYear,SR,group=factor(Fenced),color=factor(Fenced)))+
+  geom_point(alpha = 0.5)+
+  xlim(c(1,15))+
+  #geom_line(stat="summary",size=1.5)+
+  geom_smooth(se=FALSE, size = 1.5) +
+  facet_grid(Exp~NAdd)+
+  scale_color_manual(values=c("blue","cyan3")) +
+  theme_linedraw()+
+  labs(x = "Treatment Year", y = "Species Richness", color = "Fenced") +
+  theme(axis.title = element_text(size = 20, face = "bold", color = "white"), 
+        legend.title = element_text(size = 20, face = "bold",  color = "white"),
+        axis.text = element_text(size = 16, face = "bold", color = "white"),
+        plot.background = element_rect(fill = "black",colour = "black"),
+        axis.line = element_line(color = "white"),
+        panel.background = element_rect(fill = "black", color = "black"), 
+        legend.background = element_rect(fill = "black", color = "black"),
+        legend.text = element_text(size = 16, face = "bold", color = "white"),
+        panel.border = element_rect(fill = NA, linetype = 1, color = "white"),
+        strip.text = element_text(size = 16, face = "bold", color = "black"), 
+        strip.background = element_rect(fill = "white", color = "white"), 
+        legend.key = element_rect(fill = "black", color = "black"))
+
+
 ggplot(df_f,aes(TrtYear,SR,group=factor(Fenced),color=factor(Fenced)))+geom_line(stat="summary",size=1.5)+facet_grid(Exp~NAdd)+scale_color_manual(values=c("darkblue","cyan3"))
 
 
@@ -160,3 +239,13 @@ df_f_mod1 <- lm(SR~NAdd*factor(Fenced),data=df_f[df_f$TrtYear==1,])
 summary(df_f_mod1)
 Anova(df_f_mod1)
 
+View(dat.fin)
+
+
+burn_sub <- dat.fin[-which(is.na(dat.fin$Burned)),]
+burn_sub <- burn_sub[burn_sub$Field == "B" & burn_sub$Exp != "e098",]
+#burn_sub <- burn_sub[burn_sub$Fenced == 1,]
+ggplot(aes(x = TrtYear, y = SR), data = burn_sub) +
+  geom_point(aes(color = factor(Burned))) +
+  geom_smooth(aes(color = factor(Burned))) +
+  facet_grid(NTrt~Fenced)
